@@ -75,3 +75,6 @@ crashlytics-build.properties
 
 # Ignore vscode directory
 .vscode/
+
+# Ingore build directory
+Builds/
