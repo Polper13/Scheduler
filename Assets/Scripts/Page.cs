@@ -134,7 +134,7 @@ public class Page : MonoBehaviour
 
         foreach (Page page in pageList)
         {
-            if (page != this.pageGameObject) { page.deactivate(); }
+            if (page != this) { page.deactivate(); }
         }
         this.activate();
     }
@@ -161,12 +161,35 @@ public class Page : MonoBehaviour
 
     void activate()
     {
-        // move to the Top
-        this.gameObject.transform.SetAsLastSibling();
+        if (selected == false)
+        {
+            // change pageButton look -> connect to page to show that it is selected
+            VerticalLayoutGroup layout = pageButtonGameObject.GetComponent<VerticalLayoutGroup>();
+            layout.padding.bottom = 20;
+
+            // update layout
+            LayoutRebuilder.ForceRebuildLayoutImmediate(layout.GetComponent<RectTransform>());
+        }
+
         selected = true;
+        if (playingTurnedOn == false) { this.gameObject.SetActive(true); } 
+        this.gameObject.transform.SetAsLastSibling(); // move to the Top
     }
     void deactivate()
     {
+        if (selected)
+        {
+            // change pageButton look -> disconnect from page to show that it is not selected
+            VerticalLayoutGroup layout = pageButtonGameObject.GetComponent<VerticalLayoutGroup>();
+            layout.padding.bottom = 4;
+
+            // update layout
+            LayoutRebuilder.ForceRebuildLayoutImmediate(layout.GetComponent<RectTransform>());
+        }
+
         selected = false;
+        if (playingTurnedOn == false) { this.gameObject.SetActive(false); }
+
+        
     }
 }
