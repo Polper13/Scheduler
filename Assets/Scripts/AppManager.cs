@@ -13,6 +13,7 @@ public class AppManager : MonoBehaviour
     void Start()
     {
         Application.runInBackground = true;
+        Application.targetFrameRate = 30;
     }
 
     void Update()

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - pageButtonContainer
   - pageContainer
+  - submenu
   layers:
   - Default
   - TransparentFX
