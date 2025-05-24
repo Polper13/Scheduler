@@ -2,11 +2,14 @@ using UnityEngine;
 using TMPro;
 using System;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class WaitBlock : Block
 {
     [SerializeField] TMP_InputField timeInputField;
     [SerializeField] TMP_Text titleText;
+    [SerializeField] Slider progressBar;
+    Page page;
 
     public override void printInfo()
     {
@@ -21,11 +24,13 @@ public class WaitBlock : Block
         WaitBlock waitBlock = waitBlockGameObject.GetComponent<WaitBlock>();
         waitBlock.blockList = page.GetComponent<Page>().blockList;
         waitBlock.blockList.Add(waitBlock);
+        waitBlock.page = page.GetComponent<Page>();
 
         // set sibling index (order of displayingl in block container) according to index in the list
         waitBlockGameObject.transform.SetSiblingIndex(waitBlock.blockList.Count - 1);
 
         // setup
+        waitBlock.updateTiming();
         waitBlock.initialize();
     }
 
@@ -35,6 +40,23 @@ public class WaitBlock : Block
         downButton.onClick.AddListener(moveDown);
         closeButton.onClick.AddListener(destroy);
         timeInputField.onEndEdit.AddListener(checkInput);
+    }
+
+    void Update()
+    {
+        TimeSpan now = DateTime.Now.TimeOfDay;
+        TimeSpan calculatedStartTime = relativeTiming ? page.playingStartTime + startTime : startTime;
+        bool isPlaying = now > calculatedStartTime && now < calculatedStartTime + duration;
+        progressBar.gameObject.SetActive(isPlaying);
+
+        if (isPlaying)
+        {
+            double offset;
+            if (relativeTiming == false) { offset = (now - startTime).TotalSeconds; }
+            else { offset = (now - page.playingStartTime - startTime).TotalSeconds; }
+
+            progressBar.value = (float)(offset / duration.TotalSeconds);
+        }
     }
 
     private void checkInput(string input)
@@ -47,7 +69,6 @@ public class WaitBlock : Block
         {
             input = input.Substring(0, input.Length - 1);
         }
-        Debug.Log(input);
 
         int seconds;
         bool success = int.TryParse(input, out seconds);

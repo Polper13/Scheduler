@@ -15,8 +15,8 @@ public class SongBlockSettings
     {
         this.muted = muted;
         this.volume = volume;
-        fadeIn = 0;
-        fadeOut = 0;
+        fadeIn = 0f;
+        fadeOut = 0f;
     }
 }
 
@@ -101,25 +101,23 @@ public class SongBlockSettingsMenu : MonoBehaviour
     void fadeInUp()
     {
         if (currentSettings == null) { Debug.LogWarning("No settings selected to edit"); return; }
-        currentSettings.fadeIn = Mathf.Clamp(currentSettings.fadeIn + 0.5f, 0f, 5f);
+        currentSettings.fadeIn = Mathf.Clamp(currentSettings.fadeIn + 0.5f, 0f, 30f);
         currentSettings.fadeIn = (float)Math.Round(currentSettings.fadeIn, 1);
         updateDisplayedValues();
-        Debug.Log(currentSettings.fadeIn);
     }
 
     void fadeInDown()
     {
         if (currentSettings == null) { Debug.LogWarning("No settings selected to edit"); return; }
-        currentSettings.fadeIn = Mathf.Clamp(currentSettings.fadeIn - 0.5f, 0f, 5f);
+        currentSettings.fadeIn = Mathf.Clamp(currentSettings.fadeIn - 0.5f, 0f, 30f);
         currentSettings.fadeIn = (float)Math.Round(currentSettings.fadeIn, 1);
         updateDisplayedValues();
-        Debug.Log(currentSettings.fadeIn);
     }
 
     void fadeOutUp()
     {
         if (currentSettings == null) { Debug.LogWarning("No settings selected to edit"); return; }
-        currentSettings.fadeOut = Mathf.Clamp(currentSettings.fadeOut + 0.5f, 0f, 5f);
+        currentSettings.fadeOut = Mathf.Clamp(currentSettings.fadeOut + 0.5f, 0f, 30f);
         currentSettings.fadeOut = (float)Math.Round(currentSettings.fadeOut, 1);
         updateDisplayedValues();
     }
@@ -127,7 +125,7 @@ public class SongBlockSettingsMenu : MonoBehaviour
     void fadeOutDown()
     {
         if (currentSettings == null) { Debug.LogWarning("No settings selected to edit"); return; }
-        currentSettings.fadeOut = Mathf.Clamp(currentSettings.fadeOut - 0.5f, 0f, 5f);
+        currentSettings.fadeOut = Mathf.Clamp(currentSettings.fadeOut - 0.5f, 0f, 30f);
         currentSettings.fadeOut = (float)Math.Round(currentSettings.fadeOut, 1);
         updateDisplayedValues();
     }

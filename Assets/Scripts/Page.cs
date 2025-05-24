@@ -20,6 +20,7 @@ public class Page : MonoBehaviour
     public SongBlock playingBlock = null;
     bool selected = false;
     bool playingTurnedOn = false;
+    public TimeSpan playingStartTime;
 
     public static GameObject getActiveBlockContainer()
     {
@@ -84,12 +85,11 @@ public class Page : MonoBehaviour
     {
         if (playingTurnedOn == false) { return; }
 
-        TimeSpan currentTime = DateTime.Now.TimeOfDay;
         if (playingBlock != null)
         {
             if (playingBlock.shouldPlayNow() == false)
             {
-                playingBlock.stop(this);
+                playingBlock.stop();
             }
             else
             {
@@ -101,11 +101,9 @@ public class Page : MonoBehaviour
         foreach (SongBlock block in SongBlocks)
         {
             // if currentTime is in range of this blocks duration
-            if (block.shouldPlayNow() && block.isPlaying == false)
+            if (block.shouldPlayNow() && block.isPlaying == false && playingBlock == null)
             {
-                if (playingBlock != null) { playingBlock.stop(this); }
-
-                block.play(this);
+                block.play();
                 block.updateAudioSourceSettings(audioSource);
             }
         }
@@ -115,7 +113,12 @@ public class Page : MonoBehaviour
     {
         if (value == false && playingBlock != null)
         {
-            playingBlock.stop(this);
+            playingBlock.stop();
+        }
+        if (value == true)
+        {
+            TimeSpan now = DateTime.Now.TimeOfDay;
+            playingStartTime = now;
         }
 
         playIconOn.SetActive(!value);

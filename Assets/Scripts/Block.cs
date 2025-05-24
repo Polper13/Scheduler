@@ -12,6 +12,7 @@ public class Block : MonoBehaviour
     [SerializeField] protected TMP_Text startTimeText;
     [SerializeField] public TimeSpan startTime = new TimeSpan(0);
     [SerializeField] public TimeSpan duration = new TimeSpan(0);
+    protected bool relativeTiming = false;
     protected List<Block> blockList;
 
     public virtual void printInfo() {}
@@ -20,19 +21,29 @@ public class Block : MonoBehaviour
     {
         int index = blockList.IndexOf(this);
 
-        // sanity check (shouldnt happen)
-        if (index == 0) { return; }
+        if (index == 0)
+        {
+            relativeTiming = true;
+            startTime = new TimeSpan(0);
+        }
+        else if (blockList[index - 1].relativeTiming == true)
+        {
+            relativeTiming = true;
+        }
 
-        Block previous = blockList[index - 1];
-        startTime = previous.startTime + previous.duration;
-        startTimeText.text = "starting " + startTime.ToString(@"hh\:mm\:ss");
+        if (index != 0)
+        {
+            Block previous = blockList[index - 1];
+            startTime = previous.startTime + previous.duration;
+        }
+        startTimeText.text = "starting " + (relativeTiming ? "+" : "") + startTime.ToString(@"hh\:mm\:ss");
     }
 
     protected void updateWholePageTiming()
     {
         foreach (Block block in blockList)
         {
-            if (block is WaitUntilBlock) { block.updateTiming(); }
+            block.updateTiming();
         }
     }
 
@@ -47,13 +58,13 @@ public class Block : MonoBehaviour
         if (index == 0) { return; }
 
         // move stuff (swap two blocks)
-        Block blockAbowe = blockList[index - 1];
-        blockList[index] = blockAbowe;
+        Block blockAbove = blockList[index - 1];
+        blockList[index] = blockAbove;
         blockList[index - 1] = this;
         
 
         // update sibling's index'es in blockContainer
-        blockAbowe.gameObject.transform.SetSiblingIndex(index);
+        blockAbove.gameObject.transform.SetSiblingIndex(index);
         this.gameObject.transform.SetSiblingIndex(index - 1);
 
         // update timing after block order shifted

@@ -15,7 +15,6 @@ public class WaitUntilBlock : Block
 
     public override void updateTiming()
     {
-        duration = new TimeSpan(0);
         startTimeText.text = "starting " + startTime.ToString(@"hh\:mm\:ss");
 
         int index = blockList.IndexOf(this);

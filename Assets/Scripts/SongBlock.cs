@@ -7,6 +7,7 @@ using System.Collections;
 using System;
 using System.Linq;
 using Unity.VisualScripting;
+using System.Threading.Tasks;
 
 public class SongBlock : Block
 {
@@ -16,6 +17,7 @@ public class SongBlock : Block
     [SerializeField] TMP_Text songTitleText;
     [SerializeField] TMP_Text songArtistText;
     [SerializeField] TMP_Text filePathText;
+    [SerializeField] Slider progressBar;
     [SerializeField] SongBlockSettings settings = new SongBlockSettings(false, 1);
     Page page = null;
 
@@ -44,6 +46,7 @@ public class SongBlock : Block
         songBlockGameObject.transform.SetSiblingIndex(songBlock.blockList.Count - 1);
 
         // setup
+        songBlock.updateTiming();
         songBlock.initialize();
     }
 
@@ -54,6 +57,21 @@ public class SongBlock : Block
         upButton.onClick.AddListener(moveUp);
         downButton.onClick.AddListener(moveDown);
         closeButton.onClick.AddListener(destroy);
+    }
+
+    void Update()
+    {
+        progressBar.gameObject.SetActive(isPlaying);
+        if (isPlaying)
+        {
+            double offset;
+            TimeSpan now = DateTime.Now.TimeOfDay;
+
+            if (relativeTiming == false) { offset = (now - startTime).TotalSeconds; }
+            else { offset = (now - page.playingStartTime - startTime).TotalSeconds; }
+
+            progressBar.value = (float)(offset / duration.TotalSeconds);
+        }
     }
 
     // updates the displayed info about the song
@@ -81,8 +99,10 @@ public class SongBlock : Block
     // checks if current time is in this blocks duration range
     public bool shouldPlayNow()
     {
-        TimeSpan currentTime = DateTime.Now.TimeOfDay;
-        if (currentTime > startTime && currentTime < startTime + duration)
+        TimeSpan now = DateTime.Now.TimeOfDay;
+        TimeSpan calculatedStartTime = relativeTiming ? page.playingStartTime + startTime : startTime;
+
+        if (now > calculatedStartTime && now < calculatedStartTime + duration)
         {
             return true;
         }
@@ -92,10 +112,10 @@ public class SongBlock : Block
     public void updateAudioSourceSettings(AudioSource audioSource)
     {
         audioSource.mute = settings.muted;
-        audioSource.volume = settings.volume;
+        // audioSource.volume = settings.volume; - updated by fadeAudio coroutine
     }
 
-    public void play(Page page)
+    public void play()
     {
         if (audioClip == null)
         {
@@ -103,17 +123,22 @@ public class SongBlock : Block
             return;
         }
 
+        double offset;
         TimeSpan now = DateTime.Now.TimeOfDay;
-        double offset = (now - startTime).TotalSeconds;
 
+        if (relativeTiming == false) { offset = (now - startTime).TotalSeconds; }
+        else { offset = (now - page.playingStartTime - startTime).TotalSeconds; }
+        
         isPlaying = true;
         page.audioSource.clip = audioClip;
         page.audioSource.time = (float)offset;
         page.audioSource.Play();
         page.playingBlock = this;
+
+        StartCoroutine(fadeAudio());
     }
 
-    public void stop(Page page)
+    public void stop()
     {
         isPlaying = false;
         page.playingBlock = null;
@@ -121,11 +146,38 @@ public class SongBlock : Block
         page.audioSource.clip = null;
     }
 
+    private IEnumerator fadeAudio()
+    {
+        while (isPlaying)
+        {
+            TimeSpan now = DateTime.Now.TimeOfDay;
+            float elapsedSeconds = (float)page.audioSource.time;
+            float durationSeconds = (float)duration.TotalSeconds;
+
+            // fade in
+            if (elapsedSeconds >= 0 && elapsedSeconds < settings.fadeIn)
+            {
+                page.audioSource.volume = elapsedSeconds / settings.fadeIn * settings.volume;
+                // Debug.Log("fadeIn: " + page.audioSource.volume);
+            }
+            // fade out
+            else if (elapsedSeconds > durationSeconds - settings.fadeOut && elapsedSeconds <= durationSeconds)
+            {
+                page.audioSource.volume = (durationSeconds - elapsedSeconds) / settings.fadeOut * settings.volume;
+                // Debug.Log("fadeOut: " + page.audioSource.volume);
+            }
+            else { page.audioSource.volume = settings.volume; }
+
+
+            yield return null;
+        }
+    }
+
     private void destroy()
     {
         if (page != null && page.playingBlock == this)
         {
-            stop(page);
+            stop();
         }
 
         if (blockList != null && blockList.Contains(this))

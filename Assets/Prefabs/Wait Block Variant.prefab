@@ -24,6 +24,22 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1086337987138787212, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1086337987138787212, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1086337987138787212, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1086337987138787212, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -0
+      objectReference: {fileID: 0}
     - target: {fileID: 1402037805575446390, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
       propertyPath: m_text
       value: Wait
@@ -120,6 +136,38 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3976684396997902859, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
+      propertyPath: m_Color.b
+      value: 0.9529412
+      objectReference: {fileID: 0}
+    - target: {fileID: 3976684396997902859, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
+      propertyPath: m_Color.g
+      value: 0.8352941
+      objectReference: {fileID: 0}
+    - target: {fileID: 3976684396997902859, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
+      propertyPath: m_Color.r
+      value: 0.5529412
+      objectReference: {fileID: 0}
+    - target: {fileID: 4654662839070759813, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4654662839070759813, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4654662839070759813, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4654662839070759813, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4654662839070759813, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4736708571259888255, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -155,6 +203,14 @@ PrefabInstance:
     - target: {fileID: 7811476145192678643, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
       propertyPath: m_HorizontalAlignment
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7983595628146031602, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7983595628146031602, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1245694597629519613, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
@@ -210,6 +266,7 @@ MonoBehaviour:
   startTimeText: {fileID: 1911874081562986589}
   timeInputField: {fileID: 1189955185086455073}
   titleText: {fileID: 8714184106278051854}
+  progressBar: {fileID: 7955874023818631395}
 --- !u!114 &4882742476603476964 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2907343881745577116, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
@@ -241,6 +298,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7955874023818631395 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 428678654756087707, guid: a974ab7811f912d459e3b4bf5023a9eb, type: 3}
+  m_PrefabInstance: {fileID: 7753520372086013816}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &8714184106278051854 stripped
