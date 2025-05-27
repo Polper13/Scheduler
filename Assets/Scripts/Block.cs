@@ -26,15 +26,12 @@ public class Block : MonoBehaviour
             relativeTiming = true;
             startTime = new TimeSpan(0);
         }
-        else if (blockList[index - 1].relativeTiming == true)
-        {
-            relativeTiming = true;
-        }
 
         if (index != 0)
         {
             Block previous = blockList[index - 1];
             startTime = previous.startTime + previous.duration;
+            relativeTiming = previous.relativeTiming;
         }
         startTimeText.text = "starting " + (relativeTiming ? "+" : "") + startTime.ToString(@"hh\:mm\:ss");
     }

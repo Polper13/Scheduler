@@ -19,7 +19,7 @@ public class Page : MonoBehaviour
     [SerializeField] Button closeButton;
     public SongBlock playingBlock = null;
     bool selected = false;
-    bool playingTurnedOn = false;
+    public bool playingTurnedOn = false;
     public TimeSpan playingStartTime;
 
     public static GameObject getActiveBlockContainer()

@@ -47,9 +47,9 @@ public class WaitBlock : Block
         TimeSpan now = DateTime.Now.TimeOfDay;
         TimeSpan calculatedStartTime = relativeTiming ? page.playingStartTime + startTime : startTime;
         bool isPlaying = now > calculatedStartTime && now < calculatedStartTime + duration;
-        progressBar.gameObject.SetActive(isPlaying);
+        progressBar.gameObject.SetActive(isPlaying && page.playingTurnedOn);
 
-        if (isPlaying)
+        if (isPlaying && page.playingTurnedOn)
         {
             double offset;
             if (relativeTiming == false) { offset = (now - startTime).TotalSeconds; }
