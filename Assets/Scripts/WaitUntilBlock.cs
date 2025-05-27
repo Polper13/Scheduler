@@ -1,7 +1,9 @@
 using System;
+using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class WaitUntilBlock : Block
 {
@@ -61,8 +63,11 @@ public class WaitUntilBlock : Block
         titleText.color = new Color(255f / 255f, 69f / 255f, 69f / 255f);
         if (string.IsNullOrEmpty(input)) { return; }
 
-        bool success = false;
+        // change separators for one consistant ":"
+        string separators = @"[.,;-]";
+        input = Regex.Replace(input, separators, ":");
 
+        bool success = false;
         switch (input.Length)
         {
         case 8:
@@ -80,10 +85,19 @@ public class WaitUntilBlock : Block
             success = TimeSpan.TryParseExact(input, @"h\:mm", null, out startTime);
             if (success) { timeInputField.text = "0" + timeInputField.text + ":00"; }
             break;
+        case 2:
+            success = TimeSpan.TryParseExact(input, @"hh", null, out startTime);
+            if (success) { timeInputField.text = timeInputField.text + ":00:00"; }
+            break;
+        case 1:
+            success = TimeSpan.TryParseExact("0" + input, @"hh", null, out startTime);
+            if (success) { timeInputField.text = "0" + timeInputField.text + ":00:00"; }
+            break;
         }
 
         if (success)
         {
+            timeInputField.text = Regex.Replace(timeInputField.text, separators, ":");
             titleText.color = new Color(221f / 255f, 221f / 255f, 221f / 255f);
             updateTiming();
         }
