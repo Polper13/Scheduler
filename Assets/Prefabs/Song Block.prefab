@@ -1949,7 +1949,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: starting 00:00:00
+  m_text: 00:00:00 / 00:00:00
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 96c229cbd426071418900c6473f71cd8, type: 2}
   m_sharedMaterial: {fileID: -7208043930343743066, guid: 96c229cbd426071418900c6473f71cd8, type: 2}

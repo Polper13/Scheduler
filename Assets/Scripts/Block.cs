@@ -33,7 +33,8 @@ public class Block : MonoBehaviour
             startTime = previous.startTime + previous.duration;
             relativeTiming = previous.relativeTiming;
         }
-        startTimeText.text = "starting " + (relativeTiming ? "+" : "") + startTime.ToString(@"hh\:mm\:ss");
+        startTimeText.text = (relativeTiming ? "+" : "") + startTime.ToString(@"hh\:mm\:ss") + " / "
+                           + (relativeTiming ? "+" : "") + (startTime + duration).ToString(@"hh\:mm\:ss");
     }
 
     protected void updateWholePageTiming()
