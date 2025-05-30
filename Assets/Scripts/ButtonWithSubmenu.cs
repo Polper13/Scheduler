@@ -4,12 +4,16 @@ using UnityEngine.UI;
 public class ButtonWithSubmenu : MonoBehaviour
 {
     [SerializeField] GameObject submenuGameObject;
+    [SerializeField] Button submenuBackground;
     Toggle menuToggle;
 
     void Start()
     {
+        submenuBackground.gameObject.SetActive(false);
+
         menuToggle = GetComponent<Toggle>();
         menuToggle.onValueChanged.AddListener(toggleSubmenu);
+        submenuBackground.onClick.AddListener(backgroundClicked);
     }
 
     void toggleSubmenu(bool visibility)
@@ -25,6 +29,13 @@ public class ButtonWithSubmenu : MonoBehaviour
                 if (button != this) { button.menuToggle.isOn = false; }
             }
         }
-        
+
+        submenuBackground.gameObject.SetActive(visibility);
+    }
+
+    void backgroundClicked()
+    {
+        menuToggle.isOn = false;
+        submenuBackground.gameObject.SetActive(false);
     }
 }
