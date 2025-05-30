@@ -1,6 +1,29 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using TMPro;
+using UnityEngine.UI;
+
+public static class GeneralSettings
+    {
+        public static float uiScaling  = 1f;
+
+        static CanvasScaler canvasScaler;
+
+        public static void loadSettings()
+        {
+            // TODO - load settings from json
+        }
+        public static void updateSettings()
+        {
+            if (canvasScaler == null)
+            {
+                canvasScaler = GameObject.FindAnyObjectByType<CanvasScaler>();
+                if (canvasScaler == null) { Debug.LogError("Couldnt find canvas scaler"); return; }
+            }
+            
+            canvasScaler.scaleFactor = uiScaling;
+        }
+    }
 
 public class AppManager : MonoBehaviour
 {
@@ -10,10 +33,21 @@ public class AppManager : MonoBehaviour
     [SerializeField] GameObject waitUntilBlockPrefab;
     [SerializeField] GameObject waitBlockPrefab;
 
+    void Awake()
+    {
+        GeneralSettings.loadSettings();
+    }
+
     void Start()
     {
         Application.runInBackground = true;
         Application.targetFrameRate = 30;
+
+    }
+
+    void FixedUpdate()
+    {
+        GeneralSettings.updateSettings();
     }
 
     void Update()
