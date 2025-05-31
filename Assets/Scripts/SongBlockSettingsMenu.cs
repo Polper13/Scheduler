@@ -26,18 +26,23 @@ public class SongBlockSettingsMenu : MonoBehaviour
     [SerializeField] Button clickAwayButton;
 
     [Header("Volume")]
+    [SerializeField] TMP_Text volumeTitleText;
     [SerializeField] Toggle muteToggle;
     [SerializeField] Button volumeUpButton;
     [SerializeField] Button volumeDownButton;
-    [SerializeField] TMP_Text volumeText;
+    [SerializeField] TMP_InputField volumeInputField;
 
-    [Header("Fade")]
+    [Header("FadeIn")]
+    [SerializeField] TMP_Text fadeInTitleText;
     [SerializeField] Button FadeInUpButton;
     [SerializeField] Button FadeInDownButton;
-    [SerializeField] TMP_Text fadeInText;
+    [SerializeField] TMP_InputField fadeInInputField;
+
+    [Header("FadeOut")]
+    [SerializeField] TMP_Text fadeOutTitleText;
     [SerializeField] Button FadeOutUpButton;
     [SerializeField] Button FadeOutDownButton;
-    [SerializeField] TMP_Text fadeOutText;
+    [SerializeField] TMP_InputField fadeOutInputField;
 
     SongBlockSettings currentSettings;
 
@@ -48,11 +53,15 @@ public class SongBlockSettingsMenu : MonoBehaviour
         muteToggle.onValueChanged.AddListener(mute);
         volumeUpButton.onClick.AddListener(volumeUp);
         volumeDownButton.onClick.AddListener(volumeDown);
+        volumeInputField.onEndEdit.AddListener(checkVolumeInput);
 
         FadeInUpButton.onClick.AddListener(fadeInUp);
         FadeInDownButton.onClick.AddListener(fadeInDown);
+        fadeInInputField.onEndEdit.AddListener(checkFadeInInput);
+
         FadeOutUpButton.onClick.AddListener(fadeOutUp);
         FadeOutDownButton.onClick.AddListener(fadeOutDown);
+        fadeOutInputField.onEndEdit.AddListener(checkFadeOutInput);
     }
 
     void closeMenu()
@@ -71,9 +80,9 @@ public class SongBlockSettingsMenu : MonoBehaviour
 
     void updateDisplayedValues()
     {
-        volumeText.text = Mathf.Round(currentSettings.volume * 100f).ToString() + "%";
-        fadeInText.text = Math.Round(currentSettings.fadeIn, 1).ToString("F1") + "s";
-        fadeOutText.text = Math.Round(currentSettings.fadeOut, 1).ToString("F1") + "s";
+        volumeInputField.text = Mathf.Round(currentSettings.volume * 100f).ToString() + "%";
+        fadeInInputField.text = Math.Round(currentSettings.fadeIn, 1).ToString("F1") + "s";
+        fadeOutInputField.text = Math.Round(currentSettings.fadeOut, 1).ToString("F1") + "s";
     }
 
     void mute(bool value)
@@ -85,7 +94,8 @@ public class SongBlockSettingsMenu : MonoBehaviour
     void volumeUp()
     {
         if (currentSettings == null) { Debug.LogWarning("No settings selected to edit"); return; }
-        currentSettings.volume = Mathf.Clamp(currentSettings.volume + 0.05f, 0f, 1f);
+        float step = 0.05f - (float)(Math.Round(currentSettings.volume * 100) % 5f) / 100f;
+        currentSettings.volume = Mathf.Clamp(currentSettings.volume + step, 0f, 1f);
         currentSettings.volume = (float)Math.Round(currentSettings.volume, 2);
         updateDisplayedValues();
     }
@@ -93,7 +103,23 @@ public class SongBlockSettingsMenu : MonoBehaviour
     void volumeDown()
     {
         if (currentSettings == null) { Debug.LogWarning("No settings selected to edit"); return; }
-        currentSettings.volume = Mathf.Clamp(currentSettings.volume - 0.05f, 0f, 1f);
+        float step = (Math.Round(currentSettings.volume % 0.05f, 2) > 0f) ? currentSettings.volume % 0.05f : 0.05f;
+        currentSettings.volume = Mathf.Clamp(currentSettings.volume - step, 0f, 1f);
+        currentSettings.volume = (float)Math.Round(currentSettings.volume, 2);
+        updateDisplayedValues();
+    }
+
+    void checkVolumeInput(string input)
+    {
+        input = input.Replace("%", "").Trim();
+        volumeTitleText.color = new Color(255f / 255f, 69f / 255f, 69f / 255f);
+        if (string.IsNullOrEmpty(input)) { return; }
+
+        int intValue;
+        if (int.TryParse(input, out intValue) == false) { return; }
+
+        volumeTitleText.color = new Color(221f / 255f, 221f / 255f, 221f / 255f);
+        currentSettings.volume = Mathf.Clamp(intValue / 100f, 0f, 1f);
         currentSettings.volume = (float)Math.Round(currentSettings.volume, 2);
         updateDisplayedValues();
     }
@@ -101,7 +127,8 @@ public class SongBlockSettingsMenu : MonoBehaviour
     void fadeInUp()
     {
         if (currentSettings == null) { Debug.LogWarning("No settings selected to edit"); return; }
-        currentSettings.fadeIn = Mathf.Clamp(currentSettings.fadeIn + 0.5f, 0f, 30f);
+        float step = 0.5f - (float)(Math.Round(currentSettings.fadeIn * 10) % 5f) / 10f;
+        currentSettings.fadeIn = Mathf.Clamp(currentSettings.fadeIn + step, 0f, 30f);
         currentSettings.fadeIn = (float)Math.Round(currentSettings.fadeIn, 1);
         updateDisplayedValues();
     }
@@ -109,7 +136,25 @@ public class SongBlockSettingsMenu : MonoBehaviour
     void fadeInDown()
     {
         if (currentSettings == null) { Debug.LogWarning("No settings selected to edit"); return; }
-        currentSettings.fadeIn = Mathf.Clamp(currentSettings.fadeIn - 0.5f, 0f, 30f);
+        float step = (Math.Round(currentSettings.fadeIn % 0.5f, 1) > 0f) ? currentSettings.fadeIn % 0.5f : 0.5f;
+        currentSettings.fadeIn = Mathf.Clamp(currentSettings.fadeIn - step, 0f, 30f);
+        currentSettings.fadeIn = (float)Math.Round(currentSettings.fadeIn, 1);
+        updateDisplayedValues();
+    }
+
+    void checkFadeInInput(string input)
+    {
+        input = input.Replace("s", "").Replace(",", ".").Trim();
+        fadeInTitleText.color = new Color(255f / 255f, 69f / 255f, 69f / 255f);
+        if (string.IsNullOrEmpty(input)) { return; }
+
+        float floatValue;
+        var numberStyles = System.Globalization.NumberStyles.Float;
+        var culture = System.Globalization.CultureInfo.InvariantCulture;
+        if (float.TryParse(input, numberStyles, culture, out floatValue) == false) { return; }
+
+        fadeInTitleText.color = new Color(221f / 255f, 221f / 255f, 221f / 255f);
+        currentSettings.fadeIn = Mathf.Clamp(floatValue, 0f, 30f);
         currentSettings.fadeIn = (float)Math.Round(currentSettings.fadeIn, 1);
         updateDisplayedValues();
     }
@@ -117,7 +162,8 @@ public class SongBlockSettingsMenu : MonoBehaviour
     void fadeOutUp()
     {
         if (currentSettings == null) { Debug.LogWarning("No settings selected to edit"); return; }
-        currentSettings.fadeOut = Mathf.Clamp(currentSettings.fadeOut + 0.5f, 0f, 30f);
+        float step = 0.5f - (float)(Math.Round(currentSettings.fadeOut * 10) % 5f) / 10f;
+        currentSettings.fadeOut = Mathf.Clamp(currentSettings.fadeOut + step, 0f, 30f);
         currentSettings.fadeOut = (float)Math.Round(currentSettings.fadeOut, 1);
         updateDisplayedValues();
     }
@@ -125,7 +171,25 @@ public class SongBlockSettingsMenu : MonoBehaviour
     void fadeOutDown()
     {
         if (currentSettings == null) { Debug.LogWarning("No settings selected to edit"); return; }
-        currentSettings.fadeOut = Mathf.Clamp(currentSettings.fadeOut - 0.5f, 0f, 30f);
+        float step = (Math.Round(currentSettings.fadeOut % 0.5f, 1) > 0f) ? currentSettings.fadeOut % 0.5f : 0.5f;
+        currentSettings.fadeOut = Mathf.Clamp(currentSettings.fadeOut - step, 0f, 30f);
+        currentSettings.fadeOut = (float)Math.Round(currentSettings.fadeOut, 1);
+        updateDisplayedValues();
+    }
+
+    void checkFadeOutInput(string input)
+    {
+        input = input.Replace("s", "");
+        fadeOutTitleText.color = new Color(255f / 255f, 69f / 255f, 69f / 255f);
+        if (string.IsNullOrEmpty(input)) { return; }
+
+        float floatValue;
+        var numberStyles = System.Globalization.NumberStyles.Float;
+        var culture = System.Globalization.CultureInfo.InvariantCulture;
+        if (float.TryParse(input, numberStyles, culture, out floatValue) == false) { return; }
+
+        fadeOutTitleText.color = new Color(221f / 255f, 221f / 255f, 221f / 255f);
+        currentSettings.fadeOut = Mathf.Clamp(floatValue, 0f, 30f);
         currentSettings.fadeOut = (float)Math.Round(currentSettings.fadeOut, 1);
         updateDisplayedValues();
     }

@@ -1,15 +1,18 @@
 using UnityEngine;
 using TMPro;
+using Unity.VisualScripting;
+using UnityEngine.UI;
 
 public class GeneralSettingsMenu : MonoBehaviour
 {
     [SerializeField] TMP_Dropdown uiScaleDropdown;
+    [SerializeField] RectTransform dropdownTemplate;
+    [SerializeField] float maxDropdownHeight = 300f;
 
     void Start()
     {
         // default the values
         updateUIScaleDropDown();
-
 
         uiScaleDropdown.onValueChanged.AddListener(updateUIScale);
     }
