@@ -7,7 +7,6 @@ public class GeneralSettingsMenu : MonoBehaviour
 {
     [SerializeField] TMP_Dropdown uiScaleDropdown;
     [SerializeField] RectTransform dropdownTemplate;
-    [SerializeField] float maxDropdownHeight = 300f;
 
     void Start()
     {
