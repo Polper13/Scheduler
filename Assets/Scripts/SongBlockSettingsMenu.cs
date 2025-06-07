@@ -22,8 +22,16 @@ public class SongBlockSettings
 
 public class SongBlockSettingsMenu : MonoBehaviour
 {
-    [SerializeField] GameObject DimmBackground;
+    [SerializeField] GameObject dimmBackground;
     [SerializeField] Button clickAwayButton;
+
+    [Header("Preview")]
+    [SerializeField] GameObject previewGameObject;
+    [SerializeField] Toggle playToggle;
+    [SerializeField] GameObject playIconOn;
+    [SerializeField] GameObject playIconOff;
+    [SerializeField] Slider progressBar;
+    [SerializeField] TMP_Text previewTimeText;
 
     [Header("Volume")]
     [SerializeField] TMP_Text volumeTitleText;
@@ -44,11 +52,18 @@ public class SongBlockSettingsMenu : MonoBehaviour
     [SerializeField] Button FadeOutDownButton;
     [SerializeField] TMP_InputField fadeOutInputField;
 
+    SongBlock currentSongBlock;
     SongBlockSettings currentSettings;
 
     void Start()
     {
+        playIconOn.SetActive(true);
+        playIconOff.SetActive(false);
+
         clickAwayButton.onClick.AddListener(closeMenu);
+
+        progressBar.onValueChanged.AddListener(onProgressBarChange);
+        playToggle.onValueChanged.AddListener(play);
 
         muteToggle.onValueChanged.AddListener(mute);
         volumeUpButton.onClick.AddListener(volumeUp);
@@ -64,17 +79,58 @@ public class SongBlockSettingsMenu : MonoBehaviour
         fadeOutInputField.onEndEdit.AddListener(checkFadeOutInput);
     }
 
-    void closeMenu()
+    void Update()
     {
-        this.gameObject.SetActive(false);
-        DimmBackground.SetActive(false);
+        if (previewGameObject.activeInHierarchy && currentSongBlock != null && currentSongBlock.isPlaying)
+        {
+            float progress = currentSongBlock.getPreviewProgress();
+
+            if (progress > 1f)
+            {
+                currentSongBlock.stop();
+                playToggle.isOn = false;
+            }
+            else
+            {
+                progressBar.value = progress;
+                updatePreviewTime();
+            }
+        }
     }
 
-    public void openMenu(SongBlockSettings settings)
+    static string formatSeconds(float seconds)
     {
-        currentSettings = settings;
+        TimeSpan timeSpan = TimeSpan.FromSeconds(seconds);
+        if (timeSpan.Hours > 0)
+        {
+            return string.Format("{0}:{1:D2}:{2:D2}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
+        }
+        else
+        {
+            return string.Format("{0}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds);
+        }
+    }
+
+    void closeMenu()
+    {
+        // currentSongBlock.stop();
+        playToggle.isOn = false;
+
+        this.gameObject.SetActive(false);
+        dimmBackground.SetActive(false);
+    }
+
+    public void openMenu(SongBlock songBlock, bool thisPagePlaying, bool clipSelected)
+    {
+        currentSongBlock = songBlock;
+        currentSettings = songBlock.settings;
+
+        progressBar.value = 0f;
         this.gameObject.SetActive(true);
-        DimmBackground.SetActive(true);
+        previewGameObject.SetActive(!thisPagePlaying && clipSelected);
+        dimmBackground.SetActive(true);
+
+        updatePreviewTime();
         updateDisplayedValues();
     }
 
@@ -83,6 +139,33 @@ public class SongBlockSettingsMenu : MonoBehaviour
         volumeInputField.text = Mathf.Round(currentSettings.volume * 100f).ToString() + "%";
         fadeInInputField.text = Math.Round(currentSettings.fadeIn, 1).ToString("F1") + "s";
         fadeOutInputField.text = Math.Round(currentSettings.fadeOut, 1).ToString("F1") + "s";
+    }
+
+    void updatePreviewTime()
+    {
+        float progress = progressBar.value;
+
+        string passed = formatSeconds(progress * currentSongBlock.getAudioClipLength());
+        string duration = formatSeconds(currentSongBlock.getAudioClipLength());
+        previewTimeText.text = passed + " / " + duration;
+    }
+
+    void onProgressBarChange(float value)
+    {
+        if (previewGameObject.activeInHierarchy)
+        {
+            currentSongBlock.movePreview(value);
+            updatePreviewTime();
+        }
+    }
+
+    void play(bool value)
+    {
+        playIconOn.SetActive(!value);
+        playIconOff.SetActive(value);
+
+        if (value == false) { currentSongBlock.stop(); }
+        if (value == true) { currentSongBlock.playPreview(progressBar.value); }
     }
 
     void mute(bool value)

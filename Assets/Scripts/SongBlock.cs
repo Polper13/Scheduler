@@ -18,7 +18,7 @@ public class SongBlock : Block
     [SerializeField] TMP_Text songArtistText;
     [SerializeField] TMP_Text filePathText;
     [SerializeField] Slider progressBar;
-    [SerializeField] SongBlockSettings settings = new SongBlockSettings(false, 1);
+    public SongBlockSettings settings = new SongBlockSettings(false, 1);
     Page page = null;
 
     AudioClip audioClip = null;
@@ -31,7 +31,7 @@ public class SongBlock : Block
     {
         Debug.Log("SongBlock: " + songTitle);
     }
-    
+
     public static void create(GameObject container, GameObject songBlockPrefab)
     {
         GameObject songBlockGameObject = Instantiate(songBlockPrefab, container.transform);
@@ -61,8 +61,8 @@ public class SongBlock : Block
 
     void Update()
     {
-        progressBar.gameObject.SetActive(isPlaying);
-        if (isPlaying)
+        progressBar.gameObject.SetActive(isPlaying && page.playingTurnedOn);
+        if (isPlaying && page.playingTurnedOn)
         {
             double offset;
             TimeSpan now = DateTime.Now.TimeOfDay;
@@ -88,7 +88,7 @@ public class SongBlock : Block
         SongBlockSettingsMenu reference = Resources.FindObjectsOfTypeAll<SongBlockSettingsMenu>().FirstOrDefault();
         if (reference == null) { Debug.LogWarning("Couldnt find SongBlockSettingsMenu"); return; }
 
-        reference.openMenu(settings); 
+        reference.openMenu(this, page.playingTurnedOn, audioClip != null); 
     }
 
     private void mute(bool isMuted)
@@ -136,6 +136,48 @@ public class SongBlock : Block
         page.playingBlock = this;
 
         StartCoroutine(fadeAudio());
+    }
+
+    public void playPreview(float progress)
+    {
+        if (audioClip == null)
+        {
+            Debug.LogWarning("Trying to play SongBlock without clip selected");
+            return;
+        }
+
+        float offset = progress * audioClip.length;
+
+        isPlaying = true;
+        page.audioSource.clip = audioClip;
+        page.audioSource.time = offset;
+        page.audioSource.Play();
+        page.playingBlock = this;
+
+        StartCoroutine(fadeAudio());
+    }
+
+    public void movePreview(float progress)
+    {
+        if (page.audioSource.clip == null) { return; }
+
+        page.audioSource.time = progress * audioClip.length;
+    }
+
+    public float getPreviewProgress()
+    {
+        if (page.audioSource.clip == null) { return 0f; }
+
+        float time = page.audioSource.time;
+        float length = audioClip.length;
+        return time / length;
+    }
+
+    public float getAudioClipLength()
+    {
+        if (page.audioSource.clip == null) { return 0f; }
+
+        return audioClip.length;
     }
 
     public void stop()
