@@ -10327,7 +10327,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "Shortcuts\n    P -> add new Page\n    S -> add Song block\n    U -> add
-    Wait until block\n    W - > add Wait block"
+    Wait until block\n    W -> add Wait block"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 96c229cbd426071418900c6473f71cd8, type: 2}
   m_sharedMaterial: {fileID: -7208043930343743066, guid: 96c229cbd426071418900c6473f71cd8, type: 2}

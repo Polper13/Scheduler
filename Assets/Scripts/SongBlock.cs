@@ -175,7 +175,7 @@ public class SongBlock : Block
 
     public float getAudioClipLength()
     {
-        if (page.audioSource.clip == null) { return 0f; }
+        if (audioClip == null) { return 0f; }
 
         return audioClip.length;
     }
