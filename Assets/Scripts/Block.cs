@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Block : MonoBehaviour
+
+public abstract class Block : MonoBehaviour
 {
+    public abstract string type { get; }
     [SerializeField] protected Button closeButton;
     [SerializeField] protected Button upButton;
     [SerializeField] protected Button downButton;
@@ -16,6 +19,8 @@ public class Block : MonoBehaviour
     protected List<Block> blockList;
 
     public virtual void printInfo() {}
+
+    public abstract BlockData toBlockData();
 
     public virtual void updateTiming()
     {

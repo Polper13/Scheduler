@@ -11,12 +11,12 @@ public class SongBlockSettings
     public float fadeIn;
     public float fadeOut;
 
-    public SongBlockSettings(bool muted, float volume)
+    public SongBlockSettings(bool muted, float volume, float fadeIn, float fadeOut)
     {
         this.muted = muted;
         this.volume = volume;
-        fadeIn = 0f;
-        fadeOut = 0f;
+        this.fadeIn = fadeIn;
+        this.fadeOut = fadeOut;
     }
 }
 

@@ -24,23 +24,28 @@ public class Page : MonoBehaviour
 
     public static GameObject getActiveBlockContainer()
     {
+        Page page = getActivePage();
+        if (page == null) { return null; }
+
+        GameObject scrollArea = AppManager.getChildWithComponent<ScrollRect>(page.gameObject);
+        GameObject blockContainer = scrollArea.transform.GetChild(0).gameObject;
+
+        return blockContainer;
+    }
+
+    public static Page getActivePage()
+    {
         if (pageList.Count <= 0) { return null; }
          
         foreach (Page page in pageList)
         {
-            if (page.selected)
-            {
-                GameObject scrollArea = AppManager.getChildWithComponent<ScrollRect>(page.gameObject);
-                GameObject blockContainer = scrollArea.transform.GetChild(0).gameObject;
-
-                return blockContainer;
-            }
+            if (page.selected) { return page; }
         }
 
         return null;
     }
 
-    public static void create(GameObject pagePrefab, GameObject pageButtonPrefab)
+    public static Page create(GameObject pagePrefab, GameObject pageButtonPrefab)
     {
         // get references to containers
         GameObject pageButtonContainer = GameObject.FindGameObjectWithTag("pageButtonContainer");
@@ -60,6 +65,8 @@ public class Page : MonoBehaviour
 
         // initialize connections
         page.initialize();
+
+        return page;
     }
 
     void initialize()

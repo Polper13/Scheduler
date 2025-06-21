@@ -5,12 +5,15 @@ using UnityEngine.Networking;
 using SFB;
 using System.Collections;
 using System;
+using System.IO;
 using System.Linq;
-using Unity.VisualScripting;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
+using UnityEditor.Rendering;
+
 
 public class SongBlock : Block
 {
+    public override string type => "SongBlock";
     [SerializeField] Button chooseFileButton;
     [SerializeField] Button settingsButton;
     [SerializeField] TMP_Text durationText;
@@ -18,13 +21,13 @@ public class SongBlock : Block
     [SerializeField] TMP_Text songArtistText;
     [SerializeField] TMP_Text filePathText;
     [SerializeField] Slider progressBar;
-    public SongBlockSettings settings = new SongBlockSettings(false, 1);
+    public SongBlockSettings settings = new SongBlockSettings(false, 1, 0, 0);
     Page page = null;
 
     AudioClip audioClip = null;
     string songTitle = "none";
     string songArtist = "none";
-    string filePath = null;
+    public string filePath { get; private set; }
     public bool isPlaying = false;
 
     public override void printInfo()
@@ -32,7 +35,23 @@ public class SongBlock : Block
         Debug.Log("SongBlock: " + songTitle);
     }
 
-    public static void create(GameObject container, GameObject songBlockPrefab)
+    public override BlockData toBlockData()
+    {
+        return new SongBlockData
+        {
+            type = this.type,
+            fileName = filePath,
+            settings = new SongBlockSettings
+            (
+                this.settings.muted,
+                this.settings.volume,
+                this.settings.fadeIn,
+                this.settings.fadeOut
+            )
+        };
+    }
+
+    public static SongBlock create(GameObject container, GameObject songBlockPrefab)
     {
         GameObject songBlockGameObject = Instantiate(songBlockPrefab, container.transform);
 
@@ -48,6 +67,24 @@ public class SongBlock : Block
         // setup
         songBlock.updateTiming();
         songBlock.initialize();
+
+        return songBlock;
+    }
+
+    public static SongBlock create(GameObject container, GameObject songBlockPrefab, string filePath, SongBlockSettings settings)
+    {
+        SongBlock songBlock = SongBlock.create(container, songBlockPrefab);
+
+        songBlock.StartCoroutine(songBlock.loadAudioClip(filePath));
+        songBlock.settings = new SongBlockSettings
+        (
+            settings.muted,
+            settings.volume,
+            settings.fadeIn,
+            settings.fadeOut
+        );
+
+        return songBlock;
     }
 
     private void initialize()
@@ -244,12 +281,12 @@ public class SongBlock : Block
 
         if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
         {
-            string filePath = paths[0];
-            StartCoroutine(loadAudioClip(filePath));
+            this.filePath = paths[0];
+            StartCoroutine(loadAudioClip(this.filePath));
         }
     }
 
-    private IEnumerator loadAudioClip(string filePath)
+    public IEnumerator loadAudioClip(string filePath)
     {
         string fileUri = "file:///" + Uri.EscapeDataString(filePath.Replace('\\', '/')); 
         UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(fileUri, AudioType.MPEG);
@@ -282,7 +319,6 @@ public class SongBlock : Block
             duration = file.Properties.Duration;
             songArtist = file.Tag.FirstPerformer ?? "unknown";
             songTitle = file.Tag.Title ?? "unknown";
-            this.filePath = filePath;
         }
         catch (Exception ex)
         {
