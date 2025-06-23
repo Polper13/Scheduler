@@ -83,17 +83,16 @@ public class AppManager : MonoBehaviour
 
     public void load()
     {
-        BlockDataListWrapper list = SaveData.load(Application.persistentDataPath + "/save.json");
+        string extractPath;
+        BlockDataListWrapper list = SaveData.load("C:/Users/48602/OneDrive/Pulpit/save.zip", out extractPath);
         if (list == null) { return; }
 
-        Debug.Log("loaded");
+        // Debug.Log("loaded");
 
         // create a new Page
         Page page = Page.create(pagePrefab, pageButtonPrefab);
-
         GameObject container = Page.getActiveBlockContainer();
         if (container == null) {Debug.LogWarning("Couldnt find active block container"); return; }
-
 
         // load blocks to the page
         foreach (BlockData block in list.blocks)
@@ -108,7 +107,7 @@ public class AppManager : MonoBehaviour
             }
             else if (block is SongBlockData songBlock)
             {
-                SongBlock.create(container, songBlockPrefab, songBlock.fileName, songBlock.settings);
+                SongBlock.create(container, songBlockPrefab, $"{extractPath}/{songBlock.fileName}", songBlock.settings);
             }
             else
             {

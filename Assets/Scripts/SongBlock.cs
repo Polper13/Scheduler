@@ -281,8 +281,7 @@ public class SongBlock : Block
 
         if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
         {
-            this.filePath = paths[0];
-            StartCoroutine(loadAudioClip(this.filePath));
+            StartCoroutine(loadAudioClip(paths[0]));
         }
     }
 
@@ -298,6 +297,7 @@ public class SongBlock : Block
             audioClip = DownloadHandlerAudioClip.GetContent(request);
             Debug.Log("MP3 file loaded successfully! " + filePath);
 
+            this.filePath = filePath;
             loadMetadata(filePath);
             updateSongInfo();
 

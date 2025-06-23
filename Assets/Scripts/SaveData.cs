@@ -70,14 +70,29 @@ public static class SaveData
         packToZip(filePaths, fileNameMap, jsonPath, path);
 
         // remove temporary config.json and /temp directory
-        // File.Delete(jsonPath);
-        // Directory.Delete(tempDirectoryPath);
+        File.Delete(jsonPath);
+        Directory.Delete(tempDirectoryPath);
         Debug.Log("success??");
     }
 
-    public static BlockDataListWrapper load(string path)
+    public static BlockDataListWrapper load(string zipPath, out string extractPath)
     {
-        string json = File.ReadAllText(path);
+        // extract the zip file
+        string projectName = Path.GetFileNameWithoutExtension(zipPath);
+        extractPath = Application.persistentDataPath + $"/{projectName}";
+        if (Directory.Exists(extractPath))
+        {
+            // TODO handle overwrites
+        }
+        else
+        {
+            Directory.CreateDirectory(extractPath);
+        }
+        ZipFile.ExtractToDirectory(zipPath, extractPath, overwriteFiles: true);
+
+        // deserialize the json config
+        string jsonPath = extractPath + "/config.json";
+        string json = File.ReadAllText(jsonPath);
         var settings = new JsonSerializerSettings
         {
             Formatting = Formatting.Indented,
