@@ -21,6 +21,7 @@ public abstract class Block : MonoBehaviour
     public virtual void printInfo() {}
 
     public abstract BlockData toBlockData();
+    public abstract void destroy();
 
     public virtual void updateTiming()
     {

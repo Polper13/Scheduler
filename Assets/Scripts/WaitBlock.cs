@@ -103,7 +103,7 @@ public class WaitBlock : Block
         }
     }
 
-    private void destroy()
+    public override void destroy()
     {
         if (blockList != null && blockList.Contains(this))
         {

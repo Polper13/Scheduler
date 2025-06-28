@@ -252,7 +252,7 @@ public class SongBlock : Block
         }
     }
 
-    private void destroy()
+    public override void destroy()
     {
         if (page != null && page.playingBlock == this)
         {

@@ -128,7 +128,7 @@ public class WaitUntilBlock : Block
         }
     }
 
-    private void destroy()
+    public override void destroy()
     {
         if (blockList != null && blockList.Contains(this))
         {

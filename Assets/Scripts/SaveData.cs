@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 
@@ -38,6 +40,12 @@ public class BlockDataListWrapper
             songBlock.fileName = fileNameMap[filePath];
         }
     }
+}
+
+public class LoadResult
+{
+    public BlockDataListWrapper blockDataListWrapper;
+    public string extractPath;
 }
 
 public static class SaveData
@@ -75,14 +83,38 @@ public static class SaveData
         Debug.Log("success??");
     }
 
-    public static BlockDataListWrapper load(string zipPath, out string extractPath)
+    public static async Task<LoadResult> load(string zipPath)
     {
+        using (var zip = ZipFile.OpenRead(zipPath))
+        {
+            if (zip.Entries.Count == 0)
+            {
+                Debug.LogWarning("Attempt to open an empty file");
+                return null;
+            }
+        }
+
         // extract the zip file
         string projectName = Path.GetFileNameWithoutExtension(zipPath);
-        extractPath = Application.persistentDataPath + $"/{projectName}";
+        string extractPath = Application.persistentDataPath + $"/cache/{projectName}";
         if (Directory.Exists(extractPath))
         {
-            // TODO handle overwrites
+            // find OverwriteDialogMenu reference
+            OverwriteDialogMenu menu = Resources.FindObjectsOfTypeAll<OverwriteDialogMenu>().FirstOrDefault();
+            if (menu == null)
+            {
+                Debug.LogError("Couldnt find OverwriteDialogMenu reference on the scene");
+                return null;
+            }
+            bool overwrite = await menu.askForOverwrite();
+
+            if (overwrite)
+            {
+                Directory.Delete(extractPath, recursive: true);
+                Page page = Page.findByName(projectName);
+                if (page != null) { page.destroy(); }
+            }
+            else { return null; }
         }
         else
         {
@@ -98,7 +130,12 @@ public static class SaveData
             Formatting = Formatting.Indented,
             Converters = { new BlockConverter() }
         };
-        return JsonConvert.DeserializeObject<BlockDataListWrapper>(json, settings);
+
+        LoadResult loadResult = new LoadResult();
+        loadResult.blockDataListWrapper = JsonConvert.DeserializeObject<BlockDataListWrapper>(json, settings);
+        loadResult.extractPath = extractPath;
+
+        return loadResult;
     }
 
     // stores all audio file paths used in songBlocks in a single ordered List

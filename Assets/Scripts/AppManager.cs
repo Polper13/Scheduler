@@ -1,8 +1,11 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using TMPro;
+using SFB;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using System.IO;
 
 public static class GeneralSettings
     {
@@ -63,39 +66,36 @@ public class AppManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.U)) { addWaitUntilBlock(); }
         if (Input.GetKeyDown(KeyCode.W)) { addWaitBlock(); }
 
-        if (Input.GetKeyDown(KeyCode.Space)) { save(); }
-        if (Input.GetKeyDown(KeyCode.L)) { load(); }
+        if (Input.GetKeyDown(KeyCode.Space)) { export(); }
+        if (Input.GetKeyDown(KeyCode.L)) { import(); }
     }
 
-    public void save()
+    public async void import()
     {
-        Page activePage = Page.getActivePage();
-        if (activePage == null)
+        ButtonWithSubmenu.hideAllMenues();
+
+        string[] filePath = StandaloneFileBrowser.OpenFilePanel("Import project", "", "zip", false);
+        if (filePath.Length <= 0 || string.IsNullOrEmpty(filePath[0]))
         {
-            Debug.Log("no page");
+            Debug.LogWarning("No file selected to import");
             return;
         }
 
-        // string path = Application.persistentDataPath + "/save.zip";
-        string path = "C:/Users/48602/OneDrive/Pulpit/save.zip";
-        SaveData.save(activePage, path);
-    }
-
-    public void load()
-    {
-        string extractPath;
-        BlockDataListWrapper list = SaveData.load("C:/Users/48602/OneDrive/Pulpit/save.zip", out extractPath);
-        if (list == null) { return; }
-
-        // Debug.Log("loaded");
+        LoadResult loadResult = await SaveData.load(filePath[0]);
+        if (loadResult == null) { return; }
 
         // create a new Page
-        Page page = Page.create(pagePrefab, pageButtonPrefab);
+        Page page = Page.create(pagePrefab, pageButtonPrefab, Path.GetFileNameWithoutExtension(filePath[0]));
         GameObject container = Page.getActiveBlockContainer();
-        if (container == null) {Debug.LogWarning("Couldnt find active block container"); return; }
+        if (container == null)
+        {
+            Debug.LogWarning("Couldnt find active block container");
+            return;
+        }
 
         // load blocks to the page
-        foreach (BlockData block in list.blocks)
+        string extractPath = loadResult.extractPath;
+        foreach (BlockData block in loadResult.blockDataListWrapper.blocks)
         {
             if (block is WaitBlockData waitBlock)
             {
@@ -114,6 +114,27 @@ public class AppManager : MonoBehaviour
                 Debug.LogWarning("Couldnt mach a type when creating blocks from json");
             }
         }
+    }
+
+    public void export()
+    {
+        ButtonWithSubmenu.hideAllMenues();
+
+        Page activePage = Page.getActivePage();
+        if (activePage == null)
+        {
+            Debug.Log("Could not contnue with exporting: \"no page\"");
+            return;
+        }
+
+        string path = StandaloneFileBrowser.SaveFilePanel("Export project", "", "project", "zip");
+        if (string.IsNullOrEmpty(path))
+        {
+            Debug.LogWarning($"Null export path: {path}");
+            return;
+        }
+        
+        SaveData.save(activePage, path);
     }
 
     public void addPage()

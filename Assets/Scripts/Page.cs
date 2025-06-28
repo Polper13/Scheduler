@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,6 +22,7 @@ public class Page : MonoBehaviour
     bool selected = false;
     public bool playingTurnedOn = false;
     public TimeSpan playingStartTime;
+    public string pageName { get; private set; }
 
     public static GameObject getActiveBlockContainer()
     {
@@ -45,6 +47,29 @@ public class Page : MonoBehaviour
         return null;
     }
 
+    public static Page findByName(string name)
+    {
+        foreach (Page page in pageList)
+        {
+            if (page.name == name) { return page; }
+        }
+
+        return null;
+    }
+
+
+    public void setName(string name)
+    {
+        pageName = name;
+
+        GameObject textureGameObject = pageButtonGameObject.transform.GetChild(0).gameObject;
+        GameObject buttonLabel = AppManager.getChildWithComponent<TMP_Text>(textureGameObject);
+        TMP_Text buttonLabelText = buttonLabel.GetComponent<TMP_Text>();
+
+        if (buttonLabelText == null) { return; }
+        buttonLabelText.text = name;
+    }
+
     public static Page create(GameObject pagePrefab, GameObject pageButtonPrefab)
     {
         // get references to containers
@@ -59,12 +84,23 @@ public class Page : MonoBehaviour
         Page page = pageGameObject.GetComponent<Page>();
         pageList.Add(page);
 
-        // initialize references
+        // create references
         page.pageGameObject = pageGameObject;
         page.pageButtonGameObject = Instantiate(pageButtonPrefab, pageButtonContainer.transform);
 
+        // generate name
+        page.generateName();
+
         // initialize connections
         page.initialize();
+
+        return page;
+    }
+
+    public static Page create(GameObject pagePrefab, GameObject pageButtonPrefab, string name)
+    {
+        Page page = Page.create(pagePrefab, pageButtonPrefab);
+        page.setName(name);
 
         return page;
     }
@@ -86,6 +122,33 @@ public class Page : MonoBehaviour
         selectButton.onClick.AddListener(select);
         closeButton.onClick.AddListener(destroy);
         playToggle.onValueChanged.AddListener(play);
+    }
+
+    void generateName()
+    {
+        var takenIndexes = new List<int>();
+        foreach (Page pageObj in pageList)
+        {
+            if (pageObj.pageName == null) { continue; }
+            
+            if (pageObj.pageName.StartsWith("page"))
+            {
+                string numberPart = pageObj.pageName.Substring("page".Length);
+                if (int.TryParse(numberPart, out int number) && number >= 0)
+                {
+                    takenIndexes.Add(number);
+                }
+                else if (numberPart == string.Empty) { takenIndexes.Add(0); }
+            }
+        }
+
+        takenIndexes.Sort();
+        if (takenIndexes.Count == 0) { this.setName("page"); }
+        else
+        {
+            int newIndex = takenIndexes[takenIndexes.Count - 1] + 1;
+            this.setName($"page{newIndex}");
+        }
     }
 
     void FixedUpdate()
@@ -149,11 +212,17 @@ public class Page : MonoBehaviour
         this.activate();
     }
 
-    void destroy()
+    public void destroy()
     {
         if (pageList != null && pageList.Contains(this))
         {
             pageList.Remove(this);
+        }
+
+        // remove all blocks first
+        if (blockList != null && blockList.Count > 0)
+        {
+            foreach (Block block in blockList) { block.destroy(); }
         }
 
         // bring focus to first page if this one was in focus
