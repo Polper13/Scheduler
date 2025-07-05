@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

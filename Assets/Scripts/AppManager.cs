@@ -2,11 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using TMPro;
 using SFB;
-using UnityEngine.UI;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using System.IO;
-using System.IO.Compression;
 
 public class AppManager : MonoBehaviour
 {
