@@ -8558,7 +8558,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiScaleDropdown: {fileID: 166070609}
-  dropdownTemplate: {fileID: 0}
 --- !u!1 &1399904718
 GameObject:
   m_ObjectHideFlags: 0

@@ -50,6 +50,19 @@ public class LoadResult
 
 public static class SaveData
 {
+    private static string cachePath = Application.persistentDataPath + "/cache";
+
+    public static void deleteCache()
+    {
+        if (Directory.Exists(cachePath) == false) { return; }
+
+        string[] subdirectories = Directory.GetDirectories(cachePath);
+        foreach (string subdirectory in subdirectories)
+        {
+            Directory.Delete(subdirectory, recursive: true);
+        }
+    }
+
     public static void save(Page page, string path)
     {
         List<string> filePaths = getAudioFilePaths(page);
@@ -96,7 +109,7 @@ public static class SaveData
 
         // extract the zip file
         string projectName = Path.GetFileNameWithoutExtension(zipPath);
-        string extractPath = Application.persistentDataPath + $"/cache/{projectName}";
+        string extractPath = cachePath + $"/{projectName}";
         if (Directory.Exists(extractPath))
         {
             // find OverwriteDialogMenu reference

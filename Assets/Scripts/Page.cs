@@ -222,7 +222,7 @@ public class Page : MonoBehaviour
         // remove all blocks first
         if (blockList != null && blockList.Count > 0)
         {
-            foreach (Block block in blockList) { block.destroy(); }
+            foreach (Block block in new List<Block>(blockList)) { block.destroy(); }
         }
 
         // bring focus to first page if this one was in focus

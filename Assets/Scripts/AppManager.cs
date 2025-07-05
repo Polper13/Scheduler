@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using System.IO;
+using System.IO.Compression;
 
 public class AppManager : MonoBehaviour
 {
@@ -26,9 +27,9 @@ public class AppManager : MonoBehaviour
         Application.targetFrameRate = 60;
     }
 
-    void FixedUpdate()
+    void OnApplicationQuit()
     {
-
+        SaveData.deleteCache();
     }
 
     void Update()
@@ -59,6 +60,13 @@ public class AppManager : MonoBehaviour
             return;
         }
 
+        // check if contains config.json (means that its a scheduler file)
+        if (Utils.ZipContainsFile(filePath[0], "config.json") == false)
+        {
+            Debug.LogWarning($"Not a Scheduler project file: {filePath[0]}");
+            return;
+        }
+
         LoadResult loadResult = await SaveData.load(filePath[0]);
         if (loadResult == null) { return; }
 
@@ -75,21 +83,20 @@ public class AppManager : MonoBehaviour
         string extractPath = loadResult.extractPath;
         foreach (BlockData block in loadResult.blockDataListWrapper.blocks)
         {
-            if (block is WaitBlockData waitBlock)
+            switch (block)
             {
-                WaitBlock.create(container, waitBlockPrefab, waitBlock.value);
-            }
-            else if (block is WaitUntilBlockData waitUntilBlock)
-            {
-                WaitUntilBlock.create(container, waitUntilBlockPrefab, waitUntilBlock.value);
-            }
-            else if (block is SongBlockData songBlock)
-            {
-                SongBlock.create(container, songBlockPrefab, $"{extractPath}/{songBlock.fileName}", songBlock.settings);
-            }
-            else
-            {
-                Debug.LogWarning("Couldnt mach a type when creating blocks from json");
+                case WaitBlockData waitBlock:
+                    WaitBlock.create(container, waitBlockPrefab, waitBlock.value);
+                    break;
+                case WaitUntilBlockData waitUntilBlock:
+                    WaitUntilBlock.create(container, waitUntilBlockPrefab, waitUntilBlock.value);
+                    break;
+                case SongBlockData songBlock:
+                    SongBlock.create(container, songBlockPrefab, $"{extractPath}/{songBlock.fileName}", songBlock.settings);
+                    break;
+                default:
+                    Debug.LogWarning("Couldnt mach a type when creating blocks from json");
+                    break;
             }
         }
     }
