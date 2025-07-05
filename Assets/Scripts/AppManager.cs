@@ -40,9 +40,6 @@ public class AppManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.S)) { addSongBlock(); }
         if (Input.GetKeyDown(KeyCode.U)) { addWaitUntilBlock(); }
         if (Input.GetKeyDown(KeyCode.W)) { addWaitBlock(); }
-
-        if (Input.GetKeyDown(KeyCode.Space)) { export(); }
-        if (Input.GetKeyDown(KeyCode.L)) { import(); }
     }
 
     public async void import()
