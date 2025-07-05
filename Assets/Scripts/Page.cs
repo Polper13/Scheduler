@@ -29,7 +29,7 @@ public class Page : MonoBehaviour
         Page page = getActivePage();
         if (page == null) { return null; }
 
-        GameObject scrollArea = AppManager.getChildWithComponent<ScrollRect>(page.gameObject);
+        GameObject scrollArea = Utils.getChildWithComponent<ScrollRect>(page.gameObject);
         GameObject blockContainer = scrollArea.transform.GetChild(0).gameObject;
 
         return blockContainer;
@@ -63,7 +63,7 @@ public class Page : MonoBehaviour
         pageName = name;
 
         GameObject textureGameObject = pageButtonGameObject.transform.GetChild(0).gameObject;
-        GameObject buttonLabel = AppManager.getChildWithComponent<TMP_Text>(textureGameObject);
+        GameObject buttonLabel = Utils.getChildWithComponent<TMP_Text>(textureGameObject);
         TMP_Text buttonLabelText = buttonLabel.GetComponent<TMP_Text>();
 
         if (buttonLabelText == null) { return; }
@@ -117,7 +117,7 @@ public class Page : MonoBehaviour
         selectButton = pageButtonGameObject.GetComponent<Button>();
 
         GameObject temp = pageButtonGameObject.transform.GetChild(0).gameObject;
-        closeButton = AppManager.getChildWithComponent<Button>(temp).GetComponent<Button>();
+        closeButton = Utils.getChildWithComponent<Button>(temp).GetComponent<Button>();
 
         selectButton.onClick.AddListener(select);
         closeButton.onClick.AddListener(destroy);

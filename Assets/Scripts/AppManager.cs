@@ -150,16 +150,4 @@ public class AppManager : MonoBehaviour
 
         WaitBlock.create(container, waitBlockPrefab);
     }
-
-    public static GameObject getChildWithComponent<T>(GameObject parent) where T : Component
-    {
-        foreach (Transform child in parent.transform)
-        {
-            T component = child.GetComponent<T>();
-            if (component != null) { return child.gameObject; }
-        }
-
-        Debug.LogError("Couldnt find a child with component on parent: " + parent);
-        return null;
-    }
 }
