@@ -16,6 +16,10 @@ public class TaskBar : MonoBehaviour
     void Start()
     {
         AppManager appManager = FindAnyObjectByType<AppManager>();
+        if (appManager == null)
+        {
+            Debug.LogError("Couldnt find an AppManager instance");
+        }
 
         pageButton.onClick.AddListener(appManager.addPage);
         exportButton.onClick.AddListener(appManager.export);

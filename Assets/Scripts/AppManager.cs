@@ -7,28 +7,6 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using System.IO;
 
-public static class GeneralSettings
-    {
-        public static float uiScaling  = 1f;
-
-        static CanvasScaler canvasScaler;
-
-        public static void loadSettings()
-        {
-            // TODO - load settings from json
-        }
-        public static void updateSettings()
-        {
-            if (canvasScaler == null)
-            {
-                canvasScaler = GameObject.FindAnyObjectByType<CanvasScaler>();
-                if (canvasScaler == null) { Debug.LogError("Couldnt find canvas scaler"); return; }
-            }
-            
-            canvasScaler.scaleFactor = uiScaling;
-        }
-    }
-
 public class AppManager : MonoBehaviour
 {
     [SerializeField] GameObject pagePrefab;
@@ -50,7 +28,7 @@ public class AppManager : MonoBehaviour
 
     void FixedUpdate()
     {
-        GeneralSettings.updateSettings();
+
     }
 
     void Update()
