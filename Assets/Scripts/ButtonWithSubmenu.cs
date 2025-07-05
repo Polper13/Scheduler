@@ -38,4 +38,13 @@ public class ButtonWithSubmenu : MonoBehaviour
         menuToggle.isOn = false;
         submenuBackground.gameObject.SetActive(false);
     }
+
+    public static void hideAllMenues()
+    {
+        ButtonWithSubmenu[] allButtons = FindObjectsByType<ButtonWithSubmenu>(FindObjectsSortMode.None);
+        foreach (ButtonWithSubmenu button in allButtons)
+        {
+            button.menuToggle.isOn = false;
+        }
+    }
 }

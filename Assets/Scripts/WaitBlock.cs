@@ -4,8 +4,10 @@ using System;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+
 public class WaitBlock : Block
 {
+    public override string type => "WaitBlock";
     [SerializeField] TMP_InputField timeInputField;
     [SerializeField] TMP_Text titleText;
     [SerializeField] Slider progressBar;
@@ -16,7 +18,16 @@ public class WaitBlock : Block
         Debug.Log("WaitBlock: " + startTime.ToString(@"hh\:mm\:ss"));
     }
 
-    public static void create(GameObject container, GameObject waitBlockPrefab)
+    public override BlockData toBlockData()
+    {
+        return new WaitBlockData
+        {
+            type = this.type,
+            value = (int)this.duration.TotalSeconds
+        };
+    }
+
+    public static WaitBlock create(GameObject container, GameObject waitBlockPrefab)
     {
         GameObject waitBlockGameObject = Instantiate(waitBlockPrefab, container.transform);
 
@@ -32,6 +43,16 @@ public class WaitBlock : Block
         // setup
         waitBlock.updateTiming();
         waitBlock.initialize();
+
+        return waitBlock;
+    }
+
+    public static WaitBlock create(GameObject container, GameObject waitBlockPrefab, int value)
+    {
+        WaitBlock waitBlock = WaitBlock.create(container, waitBlockPrefab);
+        waitBlock.checkInput(value.ToString());
+
+        return waitBlock;
     }
 
     private void initialize()
@@ -82,7 +103,7 @@ public class WaitBlock : Block
         }
     }
 
-    private void destroy()
+    public override void destroy()
     {
         if (blockList != null && blockList.Contains(this))
         {

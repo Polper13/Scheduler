@@ -3,16 +3,25 @@ using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 public class WaitUntilBlock : Block
 {
+    public override string type => "WaitUntilBlock";
     [SerializeField] TMP_InputField timeInputField;
     [SerializeField] TMP_Text titleText;
 
     public override void printInfo()
     {
         Debug.Log("WaitUntilBlock: " + startTime.ToString(@"hh\:mm\:ss"));
+    }
+
+    public override BlockData toBlockData()
+    {
+        return new WaitUntilBlockData
+        {
+            type = this.type,
+            value = this.startTime.ToString(@"hh\:mm\:ss")
+        };
     }
 
     public override void updateTiming()
@@ -33,7 +42,7 @@ public class WaitUntilBlock : Block
         }
     }
 
-    public static void create(GameObject container, GameObject waitUntilBlockPrefab)
+    public static WaitUntilBlock create(GameObject container, GameObject waitUntilBlockPrefab)
     {
         GameObject waitUntilBlockGameObject = Instantiate(waitUntilBlockPrefab, container.transform);
 
@@ -47,7 +56,22 @@ public class WaitUntilBlock : Block
 
         // setup
         waitUntilBlock.initialize();
+
+        return waitUntilBlock;
     }
+
+    public static WaitUntilBlock create(GameObject container, GameObject waitUntilBlockPrefab, string value)
+    {
+        WaitUntilBlock waitUntilBlock = WaitUntilBlock.create(container, waitUntilBlockPrefab);
+
+        if (TimeSpan.TryParse(value, out waitUntilBlock.startTime) == false)
+        {
+            Debug.LogWarning($"Couldnt load WaitUntilBlock's startTime: {value}");
+        }
+
+        return waitUntilBlock;
+    }
+
 
     private void initialize()
     {
@@ -103,7 +127,7 @@ public class WaitUntilBlock : Block
         }
     }
 
-    private void destroy()
+    public override void destroy()
     {
         if (blockList != null && blockList.Contains(this))
         {
