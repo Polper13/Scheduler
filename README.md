@@ -1,5 +1,5 @@
 <img src="/Assets/Graphics/banner.png" alt="banner" width="1000"/><br>
-Scheduler is a Unity-based app that allows you to create music schedules that play at a chosen time and in a specific order.
+Scheduler is a Unity-based app that allows you to create music schedules that play at a chosen time and order.
 <br><br>
 ## Images
 <img src="/Images/Image1.png" alt="banner" width="1000"/><br>
