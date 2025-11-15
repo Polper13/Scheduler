@@ -73,7 +73,12 @@ public class SongBlock : Block
     {
         SongBlock songBlock = SongBlock.create(container, songBlockPrefab);
 
-        songBlock.StartCoroutine(songBlock.loadAudioClip(filePath));
+        if (!filePath.EndsWith('/'))
+        {
+            songBlock.StartCoroutine(songBlock.loadAudioClip(filePath));
+        }
+        else { Debug.LogWarning("Skipped loading song: filePath null"); }
+
         songBlock.settings = new SongBlockSettings
         (
             settings.muted,
