@@ -139,6 +139,8 @@ public class SongBlockSettingsMenu : MonoBehaviour
         volumeInputField.text = Mathf.Round(currentSettings.volume * 100f).ToString() + "%";
         fadeInInputField.text = Math.Round(currentSettings.fadeIn, 1).ToString("F1") + "s";
         fadeOutInputField.text = Math.Round(currentSettings.fadeOut, 1).ToString("F1") + "s";
+
+        muteToggle.isOn = currentSettings.muted;
     }
 
     void updatePreviewTime()
