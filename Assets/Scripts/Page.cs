@@ -175,7 +175,7 @@ public class Page : MonoBehaviour
             // if currentTime is in range of this blocks duration
             if (block.shouldPlayNow() && block.isPlaying == false && playingBlock == null)
             {
-                block.play();
+                block.play(block.settings.normalize);
                 block.updateAudioSourceSettings(audioSource);
             }
         }
