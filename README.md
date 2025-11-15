@@ -10,5 +10,9 @@ Scheduler is a Unity-based app that allows you to create music schedules that pl
 You can get the latest build download from the Releases tab [here](https://github.com/Polper13/Scheduler/releases)
 
 
+<<<<<<< HEAD
 Addicionally if you want the bleeding-edge versions, you can download the project source from `develop` branch and build it yourself in `Unity 6 (6000.0.32f1)`
+=======
+Addicionally if you want the bleeding-edge versions, you can download the project source from `develop` branch and build it yourself in `Unity 6 (6000.0.58f2)`
+>>>>>>> develop
 <sub>_(generally not advised)_</sub><br>

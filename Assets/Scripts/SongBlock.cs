@@ -19,10 +19,10 @@ public class SongBlock : Block
     [SerializeField] TMP_Text songArtistText;
     [SerializeField] TMP_Text filePathText;
     [SerializeField] Slider progressBar;
-    public SongBlockSettings settings = new SongBlockSettings(false, 1, 0, 0);
-    Page page = null;
-
-    AudioClip audioClip = null;
+    public SongBlockSettings settings = new SongBlockSettings(false, false, 1, 0, 0);
+    public Page page { get; private set; }
+    public AudioClip audioClip = null;
+    public AudioClip audioClipNormalized = null;
     string songTitle = "none";
     string songArtist = "none";
     public string filePath { get; private set; }
@@ -42,6 +42,7 @@ public class SongBlock : Block
             settings = new SongBlockSettings
             (
                 this.settings.muted,
+                this.settings.normalize,
                 this.settings.volume,
                 this.settings.fadeIn,
                 this.settings.fadeOut
@@ -73,10 +74,16 @@ public class SongBlock : Block
     {
         SongBlock songBlock = SongBlock.create(container, songBlockPrefab);
 
-        songBlock.StartCoroutine(songBlock.loadAudioClip(filePath));
+        if (!filePath.EndsWith('/'))
+        {
+            songBlock.StartCoroutine(songBlock.loadAudioClip(filePath));
+        }
+        else { Debug.LogWarning("Skipped loading song: filePath null"); }
+
         songBlock.settings = new SongBlockSettings
         (
             settings.muted,
+            settings.normalize,
             settings.volume,
             settings.fadeIn,
             settings.fadeOut
@@ -150,7 +157,7 @@ public class SongBlock : Block
         // audioSource.volume = settings.volume; - updated by fadeAudio coroutine
     }
 
-    public void play()
+    public void play(bool normalize)
     {
         if (audioClip == null)
         {
@@ -165,7 +172,7 @@ public class SongBlock : Block
         else { offset = (now - page.playingStartTime - startTime).TotalSeconds; }
         
         isPlaying = true;
-        page.audioSource.clip = audioClip;
+        page.audioSource.clip = normalize ? audioClipNormalized : audioClip;
         page.audioSource.time = (float)offset;
         page.audioSource.Play();
         page.playingBlock = this;
@@ -173,7 +180,7 @@ public class SongBlock : Block
         StartCoroutine(fadeAudio());
     }
 
-    public void playPreview(float progress)
+    public void playPreview(float progress, bool normalize)
     {
         if (audioClip == null)
         {
@@ -184,7 +191,7 @@ public class SongBlock : Block
         float offset = progress * audioClip.length;
 
         isPlaying = true;
-        page.audioSource.clip = audioClip;
+        page.audioSource.clip = normalize ? audioClipNormalized : audioClip;
         page.audioSource.time = offset;
         page.audioSource.Play();
         page.playingBlock = this;
@@ -293,6 +300,7 @@ public class SongBlock : Block
         if (request.result == UnityWebRequest.Result.Success)
         {
             audioClip = DownloadHandlerAudioClip.GetContent(request);
+            audioClipNormalized = audioClip.normalize();
             Debug.Log("MP3 file loaded successfully! " + filePath);
 
             this.filePath = filePath;

@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System;
+using System.Text.RegularExpressions;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -84,20 +85,13 @@ public class WaitBlock : Block
     {
         EventSystem.current.SetSelectedGameObject(null); // unselect the input field
         titleText.color = new Color(255f / 255f, 69f / 255f, 69f / 255f);
-        if (string.IsNullOrEmpty(input)) { return; }
-
-        if (input[input.Length - 1] == 's')
-        {
-            input = input.Substring(0, input.Length - 1);
-        }
-
-        int seconds;
-        bool success = int.TryParse(input, out seconds);
+        
+        bool success = TimeSpanUtils.tryParseDuration(input, out duration);
 
         if (success)
         {
-            duration = TimeSpan.FromSeconds(seconds);
-            timeInputField.text = seconds.ToString() + "s";
+            // generate a string to display the duration value
+            timeInputField.text = TimeSpanUtils.ToDetailedString(duration);
             titleText.color = new Color(221f / 255f, 221f / 255f, 221f / 255f);
             updateWholePageTiming();
         }

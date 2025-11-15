@@ -16,6 +16,7 @@ public class Page : MonoBehaviour
     [SerializeField] GameObject playIconOff;
     [SerializeField] GameObject pageGameObject;
     [SerializeField] GameObject pageButtonGameObject;
+    [SerializeField] TMP_Text pageNameText;
     [SerializeField] Button selectButton;
     [SerializeField] Button closeButton;
     public SongBlock playingBlock = null;
@@ -118,6 +119,7 @@ public class Page : MonoBehaviour
 
         GameObject temp = pageButtonGameObject.transform.GetChild(0).gameObject;
         closeButton = Utils.getChildWithComponent<Button>(temp).GetComponent<Button>();
+        pageNameText = Utils.getChildWithComponent<TMP_Text>(temp).GetComponent<TMP_Text>();
 
         selectButton.onClick.AddListener(select);
         closeButton.onClick.AddListener(destroy);
@@ -173,7 +175,7 @@ public class Page : MonoBehaviour
             // if currentTime is in range of this blocks duration
             if (block.shouldPlayNow() && block.isPlaying == false && playingBlock == null)
             {
-                block.play();
+                block.play(block.settings.normalize);
                 block.updateAudioSourceSettings(audioSource);
             }
         }
@@ -191,8 +193,14 @@ public class Page : MonoBehaviour
             playingStartTime = now;
         }
 
+        // update icon on play button
         playIconOn.SetActive(!value);
         playIconOff.SetActive(value);
+
+        // update page name color
+        Color playColor = new Color(105 / 255.0f, 176 / 255.0f, 87 / 255.0f, 1.0f);
+        Color defaultColor = new Color(221 / 255.0f, 221 / 255.0f, 221 / 255.0f, 1.0f);
+        pageNameText.color = value ? playColor : defaultColor;
 
         playingTurnedOn = value;
     }

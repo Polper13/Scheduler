@@ -7,13 +7,15 @@ using UnityEngine.UI;
 public class SongBlockSettings
 {
     public bool muted;
+    public bool normalize;
     public float volume;
     public float fadeIn;
     public float fadeOut;
 
-    public SongBlockSettings(bool muted, float volume, float fadeIn, float fadeOut)
+    public SongBlockSettings(bool muted, bool normalize, float volume, float fadeIn, float fadeOut)
     {
         this.muted = muted;
+        this.normalize = normalize;
         this.volume = volume;
         this.fadeIn = fadeIn;
         this.fadeOut = fadeOut;
@@ -39,6 +41,7 @@ public class SongBlockSettingsMenu : MonoBehaviour
     [SerializeField] Button volumeUpButton;
     [SerializeField] Button volumeDownButton;
     [SerializeField] TMP_InputField volumeInputField;
+    [SerializeField] Toggle normalizeToggle;
 
     [Header("FadeIn")]
     [SerializeField] TMP_Text fadeInTitleText;
@@ -69,6 +72,7 @@ public class SongBlockSettingsMenu : MonoBehaviour
         volumeUpButton.onClick.AddListener(volumeUp);
         volumeDownButton.onClick.AddListener(volumeDown);
         volumeInputField.onEndEdit.AddListener(checkVolumeInput);
+        normalizeToggle.onValueChanged.AddListener(normalize);
 
         FadeInUpButton.onClick.AddListener(fadeInUp);
         FadeInDownButton.onClick.AddListener(fadeInDown);
@@ -139,6 +143,9 @@ public class SongBlockSettingsMenu : MonoBehaviour
         volumeInputField.text = Mathf.Round(currentSettings.volume * 100f).ToString() + "%";
         fadeInInputField.text = Math.Round(currentSettings.fadeIn, 1).ToString("F1") + "s";
         fadeOutInputField.text = Math.Round(currentSettings.fadeOut, 1).ToString("F1") + "s";
+
+        muteToggle.isOn = currentSettings.muted;
+        normalizeToggle.isOn = currentSettings.normalize;
     }
 
     void updatePreviewTime()
@@ -165,7 +172,7 @@ public class SongBlockSettingsMenu : MonoBehaviour
         playIconOff.SetActive(value);
 
         if (value == false) { currentSongBlock.stop(); }
-        if (value == true) { currentSongBlock.playPreview(progressBar.value); }
+        if (value == true) { currentSongBlock.playPreview(progressBar.value, currentSettings.normalize); }
     }
 
     void mute(bool value)
@@ -205,6 +212,18 @@ public class SongBlockSettingsMenu : MonoBehaviour
         currentSettings.volume = Mathf.Clamp(intValue / 100f, 0f, 1f);
         currentSettings.volume = (float)Math.Round(currentSettings.volume, 2);
         updateDisplayedValues();
+    }
+
+    void normalize(bool value)
+    {
+        currentSettings.normalize = value;
+        if (currentSongBlock.isPlaying)
+        {
+            if (currentSongBlock.page.playingTurnedOn)
+                currentSongBlock.play(value);
+            else
+                currentSongBlock.playPreview(progressBar.value, value);
+        }
     }
 
     void fadeInUp()
